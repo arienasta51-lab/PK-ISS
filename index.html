@@ -567,6 +567,22 @@
         }
 
         
+        
+        function sanitizeFirebaseData(obj) {
+            if (Array.isArray(obj)) {
+                return obj.map(sanitizeFirebaseData);
+            } else if (obj && typeof obj === 'object') {
+                const clean = {};
+                Object.keys(obj).forEach(key => {
+                    const safeKey = String(key).replace(/[.#$\[\]\/]/g, '_');
+                    clean[safeKey] = sanitizeFirebaseData(obj[key]);
+                });
+                return clean;
+            }
+            return obj;
+        }
+
+
         function initFirebase() {
             if(!window.firebaseDb) {
                 setTimeout(initFirebase,500);
@@ -679,7 +695,7 @@
             };
 
             const dataRef = firebaseRef(firebaseDb, 'penilaian_data');
-            firebasePush(dataRef, itemData)
+            firebasePush(dataRef, sanitizeFirebaseData(itemData))
                 .then(() => {
                     alert('Data berhasil disimpan ke Firebase');
                 })
