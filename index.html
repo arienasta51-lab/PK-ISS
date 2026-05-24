@@ -40,6 +40,16 @@ window.firebaseRef = ref;
 window.firebasePush = push;
 window.firebaseOnValue = onValue;
 window.firebaseRemove = remove;
+window.firebaseReadyFlag = true;
+console.log('Firebase initialized');
+</script>
+
+
+<script>
+function waitFirebase(cb){
+    if(window.firebaseDb){ cb(); }
+    else { setTimeout(()=>waitFirebase(cb),300); }
+}
 </script>
 
 </head>
@@ -643,7 +653,9 @@ window.firebaseRemove = remove;
 
             if(window.firebaseDb){
                 const dataRef = firebaseRef(firebaseDb, 'penilaian_data');
-                firebasePush(dataRef, itemData);
+                firebasePush(dataRef, itemData)
+                .then(()=>{ console.log('Data tersimpan'); alert('Data berhasil disimpan ke Firebase'); })
+                .catch((err)=>{ console.error(err); alert('Gagal simpan: ' + err.message); });
             }
             
             alert("Sukses! Data disimpan ke Dashboard Arsip Data.");
@@ -657,8 +669,8 @@ window.firebaseRemove = remove;
 
         
         function initFirebaseSync() {
-            if(!window.firebaseDb) {
-                console.error("Firebase belum siap");
+            if(!window.firebaseDb){
+                setTimeout(initFirebaseSync,500);
                 return;
             }
             const dataRef = firebaseRef(firebaseDb, 'penilaian_data');
