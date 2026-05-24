@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Penilaian Kualitas & Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .step-content { display: none; }
+        .step-content.active { display: block; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen pb-12">
+
+    <header class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white shadow-md mb-8">
+        <div class="container mx-auto px-4 py-5 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+            <div class="flex items-center space-x-4">
+                <img src="data:image/jpeg;base64,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" alt="Logo ISS" class="h-16 w-auto rounded-full border-2 border-white/20 shadow-md object-cover">
+                <div>
+                    <h1 class="text-2xl font-bold tracking-wide">PENILAIAN KUALITAS</h1>
+                    <p class="text-xs text-indigo-100 font-light">Aplikasi Evaluasi Kinerja & Dashboard Laporan</p>
+                </div>
+            </div>
+            
+            <div class="flex bg-white/10 p-1.5 rounded-xl border border-white/20">
+                <button onclick="switchTab('form-tab', this)" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition bg-white text-blue-800 shadow-sm">
+                    <i class="fa-solid fa-pen-to-square mr-1"></i> Form Penilaian
+                </button>
+                <button onclick="switchTab('dashboard-tab', this)" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition text-white hover:bg-white/10">
+                    <i class="fa-solid fa-chart-line mr-1"></i> Dashboard Data (<span id="dashboard-count">0</span>)
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 max-w-5xl">
+        <div id="form-tab" class="tab-content active">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 mb-6">
+                <div class="grid grid-cols-2 gap-4 md:flex md:justify-between md:items-center md:space-y-0 md:space-x-4">
+                    <div class="step-indicator flex items-center space-x-3 text-blue-600 font-semibold" id="ind-1">
+                        <span class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">1</span>
+                        <span class="text-xs sm:text-sm">Informasi Utama</span>
+                    </div>
+                    <div class="step-indicator flex items-center space-x-3 text-slate-400" id="ind-2">
+                        <span class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-sm font-bold">2</span>
+                        <span class="text-xs sm:text-sm">Kebersihan Area</span>
+                    </div>
+                    <div class="step-indicator flex items-center space-x-3 text-slate-400" id="ind-3">
+                        <span class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-sm font-bold">3</span>
+                        <span class="text-xs sm:text-sm">Kinerja Personil</span>
+                    </div>
+                    <div class="step-indicator flex items-center space-x-3 text-slate-400" id="ind-4">
+                        <span class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-sm font-bold">4</span>
+                        <span class="text-xs sm:text-sm">Otorisasi & Grafik</span>
+                    </div>
+                </div>
+            </div>
+
+            <form id="evaluationForm" class="space-y-6">
+                <!-- Step 1 -->
+                <div class="step-content active bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100" id="step-1">
+                    <h3 class="text-xl font-bold text-slate-900 mb-6 flex items-center border-b pb-3 border-slate-100">
+                        <i class="fa-solid fa-user-tie text-blue-600 mr-3"></i> Profil & Cakupan Penilaian
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Nama Penilai <span class="text-red-500">*</span></label>
+                            <input type="text" id="nama_penilai" required oninput="syncSignatureName()" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" placeholder="Masukkan nama lengkap">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Jabatan Penilai <span class="text-red-500">*</span></label>
+                            <input type="text" id="jabatan_penilai" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" placeholder="Contoh: General Service Supervisor">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Tanggal Penilaian <span class="text-red-500">*</span></label>
+                            <input type="date" id="tanggal_penilaian" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Periode Penilaian <span class="text-red-500">*</span></label>
+                            <input type="text" id="periode_penilaian" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" placeholder="Contoh: Mei 2026 atau Minggu ke-3">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Penilaian Area <span class="text-red-500">*</span></label>
+                            <select id="penilaian_area" required onchange="toggleSpecialRoles()" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition font-medium">
+                                <option value="">-- Pilih Area Kerja --</option>
+                                <option value="Menara Karya">Menara Karya</option>
+                                <option value="Gedung Cyber 2">Gedung Cyber 2</option>
+                                <option value="Graha Saptaindra">Graha Saptaindra</option>
+                            </select>
+                            <p class="text-xs text-slate-400 mt-2 italic"><i class="fa-solid fa-circle-info mr-1"></i> Memilih Menara Karya / Gedung Cyber 2 akan otomatis menyembunyikan opsi Cleaner, Gardener, dan Gondola.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="step-content bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100" id="step-2">
+                    <h3 class="text-xl font-bold text-slate-900 mb-6 flex items-center border-b pb-3 border-slate-100">
+                        <i class="fa-solid fa-broom text-blue-600 mr-3"></i> Kriteria Kebersihan Area
+                    </h3>
+                    <div class="space-y-6" id="cleaning-section"></div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="step-content bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100" id="step-3">
+                    <h3 class="text-xl font-bold text-slate-900 mb-2 flex items-center border-b pb-3 border-slate-100">
+                        <i class="fa-solid fa-users text-blue-600 mr-3"></i> Personil Performance
+                    </h3>
+                    <p class="text-xs text-amber-600 bg-amber-50 p-3 rounded-xl mb-6 font-medium border border-amber-100">
+                        <i class="fa-solid fa-circle-exclamation mr-1"></i> Mohon isi seluruh aspek parameter penilaian untuk seluruh divisi jabatan aktif.
+                    </p>
+                    <div id="personnel-sections" class="space-y-8"></div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="step-content bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100" id="step-4">
+                    <h3 class="text-xl font-bold text-slate-900 mb-6 flex items-center border-b pb-3 border-slate-100">
+                        <i class="fa-solid fa-square-poll-vertical text-blue-600 mr-3"></i> Otorisasi & Analisis Grafik
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-3">Penilaian ISS Secara Keseluruhan <span class="text-red-500">*</span></label>
+                                <div class="grid grid-cols-1 gap-2">
+                                    <label class="flex items-center p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                        <input type="radio" name="iss_overall" value="Bellow" required class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                                        <div class="ml-3"><span class="block font-semibold text-red-600 text-sm">Bellow (Skor 0 > 5)</span></div>
+                                    </label>
+                                    <label class="flex items-center p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                        <input type="radio" name="iss_overall" value="Meet" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                                        <div class="ml-3"><span class="block font-semibold text-amber-600 text-sm">Meet (Skor 6 > 8)</span></div>
+                                    </label>
+                                    <label class="flex items-center p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                        <input type="radio" name="iss_overall" value="Exceed" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                                        <div class="ml-3"><span class="block font-semibold text-emerald-600 text-sm">Exceed (Skor 9 > 10)</span></div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Feedback / Masukan untuk Perbaikan</label>
+                                <textarea id="feedback" rows="3" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" placeholder="Tuliskan poin evaluasi..."></textarea>
+                            </div>
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                <label class="block text-sm font-semibold text-slate-800 mb-2">
+                                    <i class="fa-solid fa-signature text-indigo-600 mr-1"></i> Tanda Tangan Penilai <span class="text-red-500">*</span>
+                                </label>
+                                <div class="bg-white border border-slate-300 rounded-lg overflow-hidden relative" style="height: 150px;">
+                                    <canvas id="signature-pad" class="w-full h-full cursor-crosshair"></canvas>
+                                </div>
+                                <div class="flex justify-between items-center mt-2">
+                                    <button type="button" onclick="clearSignature()" class="text-xs text-red-500 hover:text-red-700 font-medium">
+                                        <i class="fa-solid fa-trash-can"></i> Bersihkan Tanda Tangan
+                                    </button>
+                                    <div class="text-xs text-slate-600 font-semibold text-right">
+                                        Penilai: <span id="auto-nama-penilai" class="text-blue-700 underline font-bold">(Belum diisi)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" onclick="generateCharts()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2.5 px-4 rounded-xl transition shadow-sm flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-arrows-rotate"></i> <span>Kalkulasi & Perbarui Grafik</span>
+                            </button>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 flex flex-col items-center">
+                            <h4 class="text-sm font-bold text-slate-700 mb-4 text-center tracking-wide uppercase"><i class="fa-solid fa-chart-pie mr-1 text-indigo-500"></i> Rangkuman Hasil Survey</h4>
+                            <div class="w-full max-w-[240px] h-[240px] flex items-center justify-center relative">
+                                <canvas id="resultPieChart"></canvas>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3 w-full mt-6 text-xs text-slate-600 border-t pt-4 border-slate-200">
+                                <div class="flex items-center"><span class="w-3 h-3 bg-emerald-500 rounded-full mr-2"></span> Sangat Baik: <strong id="lbl-sb" class="ml-1">0</strong></div>
+                                <div class="flex items-center"><span class="w-3 h-3 bg-blue-500 rounded-full mr-2"></span> Baik: <strong id="lbl-b" class="ml-1">0</strong></div>
+                                <div class="flex items-center"><span class="w-3 h-3 bg-amber-500 rounded-full mr-2"></span> Cukup: <strong id="lbl-c" class="ml-1">0</strong></div>
+                                <div class="flex items-center"><span class="w-3 h-3 bg-rose-500 rounded-full mr-2"></span> Kurang: <strong id="lbl-k" class="ml-1">0</strong></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-8 pt-6 border-t border-slate-100 flex justify-end">
+                        <button type="submit" class="w-full sm:w-auto bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-3 px-10 rounded-xl transition shadow-md flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> <span>KIRIM KE DASHBOARD & SIMPAN</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center mt-6">
+                    <button type="button" id="prevBtn" onclick="changeStep(-1)" class="bg-white border border-slate-200 text-slate-600 font-semibold py-2.5 px-6 rounded-xl hover:bg-slate-100 transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fa-solid fa-chevron-left mr-2"></i> Kembali
+                    </button>
+                    <button type="button" id="nextBtn" onclick="changeStep(1)" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-6 rounded-xl transition shadow-md">
+                        Lanjut <i class="fa-solid fa-chevron-right ml-2"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div id="dashboard-tab" class="tab-content">
+             <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 mb-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900"><i class="fa-solid fa-box-archive text-indigo-600 mr-2"></i>Arsip Data Penilaian Kualitas</h2>
+                        <p class="text-xs text-slate-500">Seluruh data survei tersimpan secara aman di sistem lokal dashboard dalam bentuk berkas digital PDF.</p>
+                    </div>
+                    <div class="bg-slate-100 text-slate-700 px-4 py-2 rounded-xl text-sm font-semibold flex items-center">
+                        <i class="fa-solid fa-file-invoice mr-2 text-blue-600"></i> Total Data: <span id="total-records" class="ml-1 text-blue-700">0</span>
+                    </div>
+                </div>
+                <div class="overflow-x-auto rounded-xl border border-slate-200">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold">
+                                <th class="p-4">Tanggal / Periode</th>
+                                <th class="p-4">Nama & Jabatan</th>
+                                <th class="p-4">Area Kerja</th>
+                                <th class="p-4 text-center">ISS Overall</th>
+                                <th class="p-4 text-center">Aksi / Dokumen</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dashboard-rows" class="divide-y divide-slate-100 text-slate-700"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- PDF TEMPLATE -->
+    <div style="display: none;">
+        <div id="pdf-template" class="bg-white text-slate-900" style="font-family: 'Arial', sans-serif; width: 720px; padding: 20px; box-sizing: border-box;">
+            
+            <div style="text-align: center; border-bottom: 3px double #1e3a8a; padding-bottom: 12px; margin-bottom: 20px;">
+                <h1 style="font-size: 20px; font-weight: bold; color: #1e3a8a; margin: 0; text-transform: uppercase;">Laporan Hasil Penilaian Kualitas</h1>
+                <p style="font-size: 11px; color: #4b5563; margin: 4px 0 0 0;">Dokumen Transkrip Resmi Hasil Evaluasi Kebersihan & Kinerja Personil</p>
+            </div>
+            
+            <!-- Info Utama -->
+            <div style="margin-bottom: 15px;">
+                <h3 style="font-size: 13px; background: #f3f4f6; padding: 6px; font-weight: bold; border-left: 4px solid #2563eb; margin-bottom: 10px;">I. INFORMASI UTAMA</h3>
+                <table style="width: 100%; font-size: 11px; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 3px; font-weight: bold; width: 23%;">Nama Penilai</td><td style="padding: 3px; width: 2%;">:</td><td id="pdf_nama" style="padding: 3px;">-</td>
+                        <td style="padding: 3px; font-weight: bold; width: 23%;">Tanggal Penilaian</td><td style="padding: 3px; width: 2%;">:</td><td id="pdf_tanggal" style="padding: 3px;">-</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 3px; font-weight: bold;">Jabatan Penilai</td><td style="padding: 3px;">:</td><td id="pdf_jabatan" style="padding: 3px;">-</td>
+                        <td style="padding: 3px; font-weight: bold;">Periode Penilaian</td><td style="padding: 3px;">:</td><td id="pdf_periode" style="padding: 3px;">-</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 3px; font-weight: bold;">Penilaian Area</td><td style="padding: 3px;">:</td><td id="pdf_area" style="padding: 3px; font-weight: bold; color: #1e3a8a;">-</td>
+                        <td colspan="3"></td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Analisis Grafik -->
+            <div style="margin-bottom: 15px;">
+                <h3 style="font-size: 13px; background: #f3f4f6; padding: 6px; font-weight: bold; border-left: 4px solid #2563eb; margin-bottom: 10px;">II. ANALISIS GRAFIK</h3>
+                <div style="width: 100%; border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; box-sizing: border-box; background-color: #ffffff;">
+                    <h4 style="text-align: center; font-size: 13px; font-weight: bold; margin: 0 0 15px 0; color: #374151;">RANGKUMAN HASIL SURVEY</h4>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr>
+                            <td style="width: 55%; text-align: center; vertical-align: middle; padding: 0;">
+                                <img id="pdf_chart_image" src="" alt="Chart" style="max-width: 140px; max-height: 140px;">
+                            </td>
+                            <td style="width: 45%; vertical-align: middle; padding: 0 10px;">
+                                <table style="font-size: 11px; border: none; border-collapse: collapse;">
+                                    <tr><td style="padding: 4px;"><div style="width: 12px; height: 12px; background-color: #10b981; border-radius: 2px;"></div></td><td style="padding: 4px 5px;">Sangat Baik: <strong id="pdf_legend_sb">0</strong></td></tr>
+                                    <tr><td style="padding: 4px;"><div style="width: 12px; height: 12px; background-color: #3b82f6; border-radius: 2px;"></div></td><td style="padding: 4px 5px;">Baik: <strong id="pdf_legend_b">0</strong></td></tr>
+                                    <tr><td style="padding: 4px;"><div style="width: 12px; height: 12px; background-color: #f59e0b; border-radius: 2px;"></div></td><td style="padding: 4px 5px;">Cukup: <strong id="pdf_legend_c">0</strong></td></tr>
+                                    <tr><td style="padding: 4px;"><div style="width: 12px; height: 12px; background-color: #f43f5e; border-radius: 2px;"></div></td><td style="padding: 4px 5px;">Kurang: <strong id="pdf_legend_k">0</strong></td></tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Ringkasan Skor -->
+            <div style="margin-bottom: 15px;">
+                <h3 style="font-size: 13px; background: #f3f4f6; padding: 6px; font-weight: bold; border-left: 4px solid #2563eb; margin-bottom: 10px;">III. RINGKASAN SKOR</h3>
+                <table style="width: 100%; font-size: 11px; border-collapse: collapse; border: 1px solid #d1d5db;">
+                    <tr style="background: #f9fafb;">
+                        <th style="border: 1px solid #d1d5db; padding: 6px; text-align: center;">Sangat Baik</th>
+                        <th style="border: 1px solid #d1d5db; padding: 6px; text-align: center;">Baik</th>
+                        <th style="border: 1px solid #d1d5db; padding: 6px; text-align: center;">Cukup</th>
+                        <th style="border: 1px solid #d1d5db; padding: 6px; text-align: center;">Kurang</th>
+                        <th style="border: 1px solid #d1d5db; padding: 6px; text-align: center; background: #eff6ff;">Status ISS</th>
+                    </tr>
+                    <tr>
+                        <td id="pdf_c_sb" style="border: 1px solid #d1d5db; padding: 6px; text-align: center; font-weight: bold;">0</td>
+                        <td id="pdf_c_b" style="border: 1px solid #d1d5db; padding: 6px; text-align: center; font-weight: bold;">0</td>
+                        <td id="pdf_c_c" style="border: 1px solid #d1d5db; padding: 6px; text-align: center; font-weight: bold;">0</td>
+                        <td id="pdf_c_k" style="border: 1px solid #d1d5db; padding: 6px; text-align: center; font-weight: bold;">0</td>
+                        <td id="pdf_status_iss" style="border: 1px solid #d1d5db; padding: 6px; text-align: center; font-weight: bold; background: #eff6ff; color: #2563eb;">-</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Detail Penilaian -->
+            <div style="margin-bottom: 15px;">
+                <h3 style="font-size: 13px; background: #f3f4f6; padding: 6px; font-weight: bold; border-left: 4px solid #2563eb; margin-bottom: 10px;">IV. DETAIL PENILAIAN</h3>
+                <div id="pdf_detail_list" style="font-size: 10px; color: #374151; width: 100%; line-height: 1.4;"></div>
+            </div>
+
+            <!-- BOTTOM SECTION: FEEDBACK & SIGNATURE (Using Table for Exact Layout) -->
+            <div style="margin-top: 30px; width: 100%;">
+                <table style="width: 100%; border-collapse: collapse; border: none;">
+                    <tr>
+                        <!-- Kolom Kiri: Feedback -->
+                        <td style="width: 60%; vertical-align: top; padding: 0; border: none;">
+                            <div style="font-size: 11px; padding: 10px; background: #fafafa; border: 1px dashed #cccccc; border-radius: 6px;">
+                                <strong>Feedback / Masukan Tambahan:</strong>
+                                <p id="pdf_feedback_text" style="margin: 4px 0 0 0; color: #374151;">Tidak ada masukan.</p>
+                            </div>
+                        </td>
+                        <!-- Spacing -->
+                        <td style="width: 5%; border: none;"></td>
+                        <!-- Kolom Kanan: Tanda Tangan -->
+                        <td style="width: 35%; vertical-align: top; text-align: center; border: none; padding-top: 8px;">
+                            <p style="margin: 0 0 8px 0; font-size: 11px; color: #1f2937;">Disetujui & Disahkan Oleh,</p>
+                            <div style="height: 85px; display: flex; align-items: center; justify-content: center; margin: 0 0 6px 0; overflow: hidden;">
+                                <img id="pdf_signature_img" src="" alt="Tanda Tangan" style="height: 75px; max-width: 190px; object-fit: contain; display: block; margin: 0 auto;">
+                            </div>
+                            <div style="display:inline-block; text-align:center; min-width:120px;">
+                                <div style="font-weight: bold; margin: 0; color: #111827; font-size: 12px; border-bottom: 1px solid #9ca3af; padding-bottom: 3px; display:inline-block; min-width:110px;" id="pdf_signature_name">Nama Penilai</div>
+                                <div style="color: #4b5563; font-size: 10px; margin-top: 4px; display:block; font-weight:500; line-height:1.3;" id="pdf_signature_role">Jabatan</div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const kriteriaKebersihan = [
+            { id: "clean_lantai", label: "Kebersihan lantai dan karpet" },
+            { id: "clean_dinding", label: "Kebersihan dinding dan langit – langit" },
+            { id: "clean_meja", label: "Kebersihan Meja Kerja dan Furniture" },
+            { id: "clean_aksesoris", label: "Kebersihan Aksesoris" },
+            { id: "clean_5r", label: "Kerapihan dan Penataan Barang (Implementasi 5R & 5S)" }
+        ];
+
+        const listJabatan = [
+            { code: "gs", name: "General Service", special: false },
+            { code: "admin", name: "Helper/Admin", special: false },
+            { code: "mail", name: "Mailing dan Messenger", special: false },
+            { code: "tek", name: "Teknisi", special: false },
+            { code: "rec", name: "Receptionist", special: false },
+            { code: "tel", name: "Operator Telepon", special: false },
+            { code: "spv", name: "Supervisor", special: false },
+            { code: "rel", name: "Reliever/Manpower Pengganti", special: false },
+            { code: "cln", name: "Cleaner", special: true },
+            { code: "gdn", name: "Gardener", special: true },
+            { code: "gnd", name: "Gondola", special: true }
+        ];
+
+        const aspekPenilaian = [
+            { suffix: "sikap", label: "SIKAP (Attitude *Respon dalam menerima pekerjaan)" },
+            { suffix: "grooming", label: "Penampilan (Grooming)" },
+            { suffix: "rajin", label: "KERAJINAN" },
+            { suffix: "komunikasi", label: "KOMUNIKASI" },
+            { suffix: "skill", label: "Skill dan Pengetahuan (pemahaman terkait pekerjaan)" }
+        ];
+
+        const optionsNilai = ["Sangat baik", "Baik", "Cukup", "Kurang"];
+        let currentStep = 1;
+        let myPieChart = null;
+        let signaturePad = null;
+        let localDashboardData = [];
+
+        document.addEventListener("DOMContentLoaded", function() {
+            renderKebersihanArea();
+            renderPersonelPerformance();
+            updateStepView();
+            initChart();
+        });
+
+        function switchTab(tabId, button) {
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = "tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition text-white hover:bg-white/10";
+            });
+            button.className = "tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition bg-white text-blue-800 shadow-sm";
+        }
+
+        function syncSignatureName() {
+            const val = document.getElementById("nama_penilai").value;
+            document.getElementById("auto-nama-penilai").innerText = val ? val : "(Belum diisi)";
+        }
+        
+        function initSignaturePad() {
+            const canvas = document.getElementById('signature-pad');
+            if(!canvas) return;
+            if(canvas.offsetWidth > 0) {
+                const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                canvas.width = canvas.offsetWidth * ratio;
+                canvas.height = canvas.offsetHeight * ratio;
+                canvas.getContext("2d").scale(ratio, ratio);
+                if(signaturePad) signaturePad.off();
+                signaturePad = new SignaturePad(canvas, {
+                    backgroundColor: 'rgb(255, 255, 255)',
+                    penColor: 'rgb(30, 58, 138)'
+                });
+            }
+        }
+
+        function clearSignature() { if(signaturePad) signaturePad.clear(); }
+
+        function renderKebersihanArea() {
+            const container = document.getElementById("cleaning-section");
+            container.innerHTML = kriteriaKebersihan.map((item, index) => `
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/60 flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0">
+                    <div class="max-w-md">
+                        <span class="text-xs font-bold text-slate-400 block mb-0.5">KRITERIA 0${index+1}</span>
+                        <span class="font-medium text-slate-800">${item.label}</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2 w-full md:w-auto">
+                        ${optionsNilai.map(opt => `
+                            <label class="flex-1 md:flex-none text-center cursor-pointer text-xs font-medium px-3 py-2 rounded-lg border bg-white border-slate-200 select-none transition-all duration-150">
+                                <input type="radio" name="${item.id}" value="${opt}" required class="sr-only" onchange="styleRadioButtons(this)">
+                                ${opt}
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderPersonelPerformance() {
+            const container = document.getElementById("personnel-sections");
+            container.innerHTML = listJabatan.map(jab => `
+                <div id="section-${jab.code}" class="border border-slate-100 rounded-xl bg-white p-5 shadow-xs transition-all">
+                    <h4 class="text-base font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100 flex items-center justify-between">
+                        <span><i class="fa-solid fa-user-gear text-indigo-500 mr-2"></i>Divisi: ${jab.name}</span>
+                        <span class="text-xs px-2.5 py-1 bg-indigo-50 text-indigo-600 rounded-full font-semibold">Aktif</span>
+                    </h4>
+                    <div class="space-y-4">
+                        ${aspekPenilaian.map(aspek => `
+                            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center p-3 rounded-lg hover:bg-slate-50 transition border-b border-dashed border-slate-100 last:border-0">
+                                <span class="text-sm text-slate-700 font-medium mb-2 lg:mb-0">${aspek.label}</span>
+                                <div class="flex flex-wrap gap-2 w-full lg:w-auto">
+                                    ${optionsNilai.map(opt => `
+                                        <label class="flex-1 lg:flex-none text-center cursor-pointer text-xs px-3 py-1.5 rounded-md border bg-white border-slate-200 select-none transition-all">
+                                            <input type="radio" name="p_${jab.code}_${aspek.suffix}" value="${opt}" required class="sr-only" onchange="styleRadioButtons(this)">
+                                            ${opt}
+                                        </label>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function styleRadioButtons(input) {
+            const groupName = input.name;
+            const radios = document.getElementsByName(groupName);
+            radios.forEach(r => {
+                const label = r.parentElement;
+                if(r.checked) {
+                    if(r.value === "Sangat baik") { label.className = label.className.replace(/bg-white|bg-blue-500|bg-amber-500|bg-rose-500/g, '') + " bg-emerald-500 text-white border-emerald-600 shadow-sm"; }
+                    else if(r.value === "Baik") { label.className = label.className.replace(/bg-white|bg-emerald-500|bg-amber-500|bg-rose-500/g, '') + " bg-blue-500 text-white border-blue-600 shadow-sm"; }
+                    else if(r.value === "Cukup") { label.className = label.className.replace(/bg-white|bg-emerald-500|bg-blue-500|bg-rose-500/g, '') + " bg-amber-500 text-white border-amber-600 shadow-sm"; }
+                    else { label.className = label.className.replace(/bg-white|bg-emerald-500|bg-blue-500|bg-amber-500/g, '') + " bg-rose-500 text-white border-rose-600 shadow-sm"; }
+                } else {
+                    label.className = label.className.replace(/bg-emerald-500|bg-blue-500|bg-amber-500|bg-rose-500|text-white|border-emerald-600|border-blue-600|border-amber-600|border-rose-600|shadow-sm/g, '').trim() + " bg-white text-slate-700 border-slate-200";
+                }
+            });
+        }
+
+        function toggleSpecialRoles() {
+            const areaValue = document.getElementById("penilaian_area").value;
+            const specialRoles = ["cln", "gdn", "gnd"]; 
+            const shouldHide = (areaValue === "Menara Karya" || areaValue === "Gedung Cyber 2");
+
+            specialRoles.forEach(code => {
+                const element = document.getElementById(`section-${code}`);
+                if (element) {
+                    if (shouldHide) {
+                        element.style.display = "none";
+                        aspekPenilaian.forEach(a => {
+                            document.getElementsByName(`p_${code}_${a.suffix}`).forEach(r => { r.required = false; r.checked = false; r.parentElement.className = r.parentElement.className.replace(/bg-emerald-500|bg-blue-500|bg-amber-500|bg-rose-500|text-white/g, '').trim() + " bg-white text-slate-700 border-slate-200"; });
+                        });
+                    } else {
+                        element.style.display = "block";
+                        aspekPenilaian.forEach(a => { document.getElementsByName(`p_${code}_${a.suffix}`).forEach(r => r.required = true); });
+                    }
+                }
+            });
+            generateCharts();
+        }
+
+        function changeStep(direction) {
+            if (direction === 1) {
+                const currentFormSection = document.getElementById(`step-${currentStep}`);
+                const inputs = currentFormSection.querySelectorAll("input[required], select[required]");
+                let valid = true;
+                
+                inputs.forEach(input => { if(!input.checkValidity()) { input.reportValidity(); valid = false; } });
+
+                if(currentStep === 2 || currentStep === 3) {
+                    const uniqueNames = new Set(Array.from(currentFormSection.querySelectorAll("input[type='radio'][required]")).map(r => r.name));
+                    for(let name of uniqueNames) {
+                        if(!currentFormSection.querySelector(`input[name="${name}"]:checked`)) { alert("Mohon lengkapi seluruh kriteria."); return; }
+                    }
+                }
+                if (!valid) return;
+            }
+            currentStep += direction;
+            updateStepView();
+            if(currentStep === 4) {
+                setTimeout(() => { initSignaturePad(); generateCharts(); }, 50);
+            }
+        }
+
+        function updateStepView() {
+            document.querySelectorAll(".step-content").forEach((el, index) => { el.classList.toggle("active", (index + 1) === currentStep); });
+            document.querySelectorAll(".step-indicator").forEach((el, index) => {
+                if ((index + 1) === currentStep) {
+                    el.className = "step-indicator flex items-center space-x-3 text-blue-600 font-semibold";
+                    el.querySelector("span").className = "w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold";
+                } else if ((index + 1) < currentStep) {
+                    el.className = "step-indicator flex items-center space-x-3 text-emerald-600 font-medium";
+                    el.querySelector("span").className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-sm";
+                } else {
+                    el.className = "step-indicator flex items-center space-x-3 text-slate-400";
+                    el.querySelector("span").className = "w-8 h-8 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-sm";
+                }
+            });
+            document.getElementById("prevBtn").disabled = (currentStep === 1);
+            document.getElementById("nextBtn").style.display = (currentStep === 4) ? "none" : "inline-flex";
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('resultPieChart').getContext('2d');
+            myPieChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Sangat baik', 'Baik', 'Cukup', 'Kurang'],
+                    datasets: [{ data: [0, 0, 0, 0], backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#f43f5e'], borderWidth: 2, borderColor: '#ffffff' }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+        }
+
+        function countMetrics() {
+            let counts = { "Sangat baik": 0, "Baik": 0, "Cukup": 0, "Kurang": 0 };
+            document.querySelectorAll("input[type='radio']:checked").forEach(radio => {
+                if(counts[radio.value] !== undefined && radio.name !== 'iss_overall') counts[radio.value]++;
+            });
+            return counts;
+        }
+
+        function generateCharts() {
+            const counts = countMetrics();
+            document.getElementById("lbl-sb").innerText = counts["Sangat baik"];
+            document.getElementById("lbl-b").innerText = counts["Baik"];
+            document.getElementById("lbl-c").innerText = counts["Cukup"];
+            document.getElementById("lbl-k").innerText = counts["Kurang"];
+            if(myPieChart) {
+                myPieChart.data.datasets[0].data = [counts["Sangat baik"], counts["Baik"], counts["Cukup"], counts["Kurang"]];
+                myPieChart.update();
+            }
+        }
+
+        function getDetailedSelections() {
+            let details = {};
+            details['Kebersihan Area'] = {};
+            kriteriaKebersihan.forEach(item => {
+                const checked = document.querySelector(`input[name="${item.id}"]:checked`);
+                if(checked) details['Kebersihan Area'][item.label] = checked.value;
+            });
+
+            listJabatan.forEach(jab => {
+                const section = document.getElementById(`section-${jab.code}`);
+                if(section && section.style.display !== 'none') {
+                    details[jab.name] = {};
+                    aspekPenilaian.forEach(aspek => {
+                        const checked = document.querySelector(`input[name="p_${jab.code}_${aspek.suffix}"]:checked`);
+                        if(checked) details[jab.name][aspek.label] = checked.value;
+                    });
+                    if(Object.keys(details[jab.name]).length === 0) delete details[jab.name];
+                }
+            });
+            return details;
+        }
+
+        document.getElementById("evaluationForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const issOverall = document.querySelector("input[name='iss_overall']:checked")?.value;
+            if(!issOverall) { alert("Pilih Penilaian ISS!"); return; }
+            if(signaturePad.isEmpty()) { alert("Berikan tanda tangan pengesahan!"); return; }
+
+            const chartCanvas = document.getElementById('resultPieChart');
+            
+            const itemData = {
+                id: "REP-" + Date.now(),
+                nama: document.getElementById("nama_penilai").value,
+                jabatan: document.getElementById("jabatan_penilai").value,
+                tanggal: document.getElementById("tanggal_penilaian").value,
+                periode: document.getElementById("periode_penilaian").value,
+                area: document.getElementById("penilaian_area").value,
+                feedback: document.getElementById("feedback").value || "Tidak ada feedback.",
+                iss: issOverall,
+                signature: signaturePad.toDataURL(),
+                metrics: countMetrics(),
+                chartImage: chartCanvas.toDataURL('image/png'),
+                detailedSelections: getDetailedSelections()
+            };
+
+            localDashboardData.unshift(itemData);
+            renderDashboard();
+            
+            alert("Sukses! Data disimpan ke Dashboard Arsip Data.");
+            document.getElementById("evaluationForm").reset();
+            clearSignature();
+            document.getElementById("auto-nama-penilai").innerText = "(Belum diisi)";
+            currentStep = 1;
+            updateStepView();
+            switchTab('dashboard-tab', document.querySelectorAll('.tab-btn')[1]);
+        });
+
+        function deleteRecord(id) {
+            if(confirm("Apakah Anda yakin ingin menghapus data ini?")) {
+                localDashboardData = localDashboardData.filter(item => item.id !== id);
+                renderDashboard();
+            }
+        }
+
+        function renderDashboard() {
+            const tbody = document.getElementById("dashboard-rows");
+            document.getElementById("dashboard-count").innerText = localDashboardData.length;
+            document.getElementById("total-records").innerText = localDashboardData.length;
+
+            if(localDashboardData.length === 0) {
+                tbody.innerHTML = `<tr id="empty-row"><td colspan="5" class="p-8 text-center text-slate-400"><i class="fa-solid fa-folder-open text-4xl block mb-2 text-slate-300"></i>Belum ada data survei.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = localDashboardData.map(data => {
+                let badgeColor = data.iss === "Bellow" ? "bg-rose-100 text-rose-800 border-rose-200" : (data.iss === "Meet" ? "bg-amber-100 text-amber-800 border-amber-200" : "bg-emerald-100 text-emerald-800 border-emerald-200");
+                return `
+                    <tr class="hover:bg-slate-50/80 transition">
+                        <td class="p-4"><div class="font-semibold text-slate-900">${data.tanggal}</div><div class="text-xs text-slate-400">Periode: ${data.periode}</div></td>
+                        <td class="p-4"><div class="font-medium text-slate-800">${data.nama}</div><div class="text-xs text-slate-400">${data.jabatan}</div></td>
+                        <td class="p-4 font-semibold text-slate-700">${data.area}</td>
+                        <td class="p-4 text-center"><span class="px-2.5 py-1 text-xs font-bold rounded-full border ${badgeColor}">${data.iss}</span></td>
+                        <td class="p-4 text-center">
+                            <div class="flex justify-center space-x-2">
+                                <button onclick="downloadPDF('${data.id}')" class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-1.5 px-3 rounded-lg shadow-sm transition" title="Download PDF">
+                                    <i class="fa-solid fa-file-pdf mr-1"></i> PDF
+                                </button>
+                                <button onclick="deleteRecord('${data.id}')" class="inline-flex items-center bg-red-500 hover:bg-red-600 text-white text-xs font-semibold py-1.5 px-3 rounded-lg shadow-sm transition" title="Hapus Data">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function downloadPDF(recordId) {
+            const record = localDashboardData.find(d => d.id === recordId);
+            if(!record) return;
+
+            document.getElementById("pdf_nama").innerText = record.nama;
+            document.getElementById("pdf_jabatan").innerText = record.jabatan;
+            document.getElementById("pdf_tanggal").innerText = record.tanggal;
+            document.getElementById("pdf_periode").innerText = record.periode;
+            document.getElementById("pdf_area").innerText = record.area;
+            
+            document.getElementById("pdf_c_sb").innerText = record.metrics["Sangat baik"];
+            document.getElementById("pdf_c_b").innerText = record.metrics["Baik"];
+            document.getElementById("pdf_c_c").innerText = record.metrics["Cukup"];
+            document.getElementById("pdf_c_k").innerText = record.metrics["Kurang"];
+            document.getElementById("pdf_status_iss").innerText = record.iss;
+            
+            document.getElementById("pdf_legend_sb").innerText = record.metrics["Sangat baik"];
+            document.getElementById("pdf_legend_b").innerText = record.metrics["Baik"];
+            document.getElementById("pdf_legend_c").innerText = record.metrics["Cukup"];
+            document.getElementById("pdf_legend_k").innerText = record.metrics["Kurang"];
+            
+            document.getElementById("pdf_chart_image").src = record.chartImage;
+
+            let detailHtml = '';
+            const selections = record.detailedSelections;
+            for (const [category, items] of Object.entries(selections)) {
+                // Inline page-break style added here
+                detailHtml += `<div style="margin-bottom: 8px; page-break-inside: avoid;"><strong style="display: block; background: #f3f4f6; padding: 3px 6px; border-radius: 3px; font-size: 10px;">${category}</strong><ul style="margin: 3px 0 0 15px; padding: 0; list-style-type: square;">`;
+                for (const [item, value] of Object.entries(items)) {
+                    let color = '#374151';
+                    if(value === 'Sangat baik') color = '#059669';
+                    if(value === 'Baik') color = '#2563eb';
+                    if(value === 'Cukup') color = '#d97706';
+                    if(value === 'Kurang') color = '#dc2626';
+                    detailHtml += `<li style="margin-bottom: 1px; word-wrap: break-word; white-space: normal;">${item}: <span style="font-weight: bold; color: ${color};">${value}</span></li>`;
+                }
+                detailHtml += `</ul></div>`;
+            }
+            document.getElementById('pdf_detail_list').innerHTML = detailHtml;
+
+            document.getElementById("pdf_feedback_text").innerText = record.feedback;
+            
+            // Signature Population
+            document.getElementById("pdf_signature_name").innerText = record.nama || document.getElementById("nama_penilai").value || "-";
+            const jabatanText = (record.jabatan && record.jabatan.trim()) ? record.jabatan : (document.getElementById("jabatan_penilai")?.value || "-");
+            const roleEl = document.getElementById("pdf_signature_role");
+            roleEl.innerText = jabatanText;
+            roleEl.textContent = jabatanText;
+            roleEl.style.display = "block";
+            roleEl.style.visibility = "visible";
+            roleEl.style.color = "#374151";
+            roleEl.style.fontSize = "11px";
+            document.getElementById("pdf_signature_img").src = record.signature;
+
+            const element = document.getElementById('pdf-template');
+            const opt = {
+                margin: 10,
+                filename: `Laporan_Penilaian_${record.area.replace(/\s+/g, '_')}_${record.tanggal}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 3, logging: false, useCORS: true, scrollY: 0, backgroundColor: '#ffffff' },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
+</body>
+</html>
