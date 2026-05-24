@@ -17,6 +17,31 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
     </style>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAq6AhJ06LrrDbt-gfP9dxc6wJStMhCb-E",
+  authDomain: "pk-iss.firebaseapp.com",
+  databaseURL: "https://pk-iss-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "pk-iss",
+  storageBucket: "pk-iss.firebasestorage.app",
+  messagingSenderId: "1094473861750",
+  appId: "1:1094473861750:web:57c4ed7d49ca6c1b36ad57",
+  measurementId: "G-G05SQ4BZ0H"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+window.firebaseDb = db;
+window.firebaseRef = ref;
+window.firebasePush = push;
+window.firebaseOnValue = onValue;
+window.firebaseRemove = remove;
+</script>
+
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen pb-12">
 
@@ -203,7 +228,7 @@
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
                     <div>
                         <h2 class="text-xl font-bold text-slate-900"><i class="fa-solid fa-box-archive text-indigo-600 mr-2"></i>Arsip Data Penilaian Kualitas</h2>
-                        <p class="text-xs text-slate-500">Seluruh data survei tersimpan secara aman di sistem lokal dashboard dalam bentuk berkas digital PDF.</p>
+                        <p class="text-xs text-slate-500">Seluruh data survei tersimpan online di Firebase dan dapat diakses seluruh pengguna yang memiliki link aplikasi.</p>
                     </div>
                     <div class="bg-slate-100 text-slate-700 px-4 py-2 rounded-xl text-sm font-semibold flex items-center">
                         <i class="fa-solid fa-file-invoice mr-2 text-blue-600"></i> Total Data: <span id="total-records" class="ml-1 text-blue-700">0</span>
@@ -371,13 +396,14 @@
         let currentStep = 1;
         let myPieChart = null;
         let signaturePad = null;
-        let localDashboardData = [];
+        let localDashboardData = []; let firebaseReady = false;
 
         document.addEventListener("DOMContentLoaded", function() {
             renderKebersihanArea();
             renderPersonelPerformance();
             updateStepView();
             initChart();
+            setTimeout(initFirebaseSync, 300);
         });
 
         function switchTab(tabId, button) {
@@ -615,8 +641,10 @@
                 detailedSelections: getDetailedSelections()
             };
 
-            localDashboardData.unshift(itemData);
-            renderDashboard();
+            if(window.firebaseDb){
+                const dataRef = firebaseRef(firebaseDb, 'penilaian_data');
+                firebasePush(dataRef, itemData);
+            }
             
             alert("Sukses! Data disimpan ke Dashboard Arsip Data.");
             document.getElementById("evaluationForm").reset();
@@ -627,10 +655,32 @@
             switchTab('dashboard-tab', document.querySelectorAll('.tab-btn')[1]);
         });
 
+        
+        function initFirebaseSync() {
+            if(!window.firebaseDb) {
+                console.error("Firebase belum siap");
+                return;
+            }
+            const dataRef = firebaseRef(firebaseDb, 'penilaian_data');
+            firebaseOnValue(dataRef, (snapshot) => {
+                let arr = [];
+                snapshot.forEach((child) => {
+                    arr.push({ firebaseKey: child.key, ...child.val() });
+                });
+                arr.sort((a,b)=> (b.id||'').localeCompare(a.id||''));
+                localDashboardData = arr;
+                renderDashboard();
+            });
+            firebaseReady = true;
+        }
+
+
         function deleteRecord(id) {
             if(confirm("Apakah Anda yakin ingin menghapus data ini?")) {
-                localDashboardData = localDashboardData.filter(item => item.id !== id);
-                renderDashboard();
+                const item = localDashboardData.find(d => d.id === id);
+                if(item && item.firebaseKey && window.firebaseDb){
+                    firebaseRemove(firebaseRef(firebaseDb, 'penilaian_data/' + item.firebaseKey));
+                }
             }
         }
 
